@@ -1,5 +1,24 @@
 local mod = get_mod("Crosshair Kill Confirmation")
 
+mod:hook_safe(DamageUtils, "buff_on_attack", function(unit, hit_unit, attack_type, is_critical) -- Check if the attack is a critical hit
+    if is_critical then
+        
+        crit = true
+    else
+        crit = false -- prevents false positives to reoccuring after first positive
+    end
+
+    return true
+end)
+
+mod.get_color_from_settings = function(self, type)
+    local red = mod:get("red" .. type)
+    local green = mod:get("green" .. type)
+    local blue = mod:get("blue" .. type)
+
+    return { red or 255, green or 255, blue or 255 }
+end
+
 local unit_types = {
     "normal",
     "special",
@@ -105,6 +124,7 @@ mod.unit_category = function(unit)
     breed_categories["chaos_berzerker"] = "elite"
     breed_categories["chaos_raider"] = "elite"
     breed_categories["chaos_warrior"] = "elite"
+    breed_categories["chaos_bulwark"] = "elite"
     breed_categories["beastmen_bestigor"] = "elite"
     
     breed_categories["skaven_rat_ogre"] = "boss"
@@ -125,10 +145,10 @@ mod.unit_category = function(unit)
     if breed_categories[breed_name] then
         return breed_categories[breed_name]
     else
-        -- Handle unknown breeds: everything below 300 HP is normal, above is a boss
+        -- Handle unknown breeds: everything below 550 HP is normal, above is a boss
         local health_extension = ScriptUnit.extension(unit, "health_system")
         local hp = health_extension:get_max_health()
-        if hp > 300 then
+        if hp > 550 then
             return "boss"
         else
             return "normal"
@@ -174,26 +194,29 @@ mod:hook(GenericHitReactionExtension, "_execute_effect", function(func, self, un
 
                 if attacker_unit == player_unit then
                     sizes[unit_type] = 0
+ 
+                   if (hit_zone == "head" or hit_zone == "weakspot") and crit then
+                        color = mod:get_color_from_settings("crithead")
+                   elseif damage_type == "arrow_poison_dot" or damage_type == "bleed" or damage_type == "burninating" then
+                        color = mod:get_color_from_settings("dot")
+                   elseif crit then
+                        color = mod:get_color_from_settings("crit")
+                   elseif hit_zone == "head" or hit_zone == "weakspot" then
+                        color = mod:get_color_from_settings("head")
+                   elseif opacities[unit_type] and opacities[unit_type] < 200 then
+                        color = mod:get_color_from_settings("regular")
+                   end
 
-                    if opacities[unit_type] < 200 then -- Low priority color - Avoid overriding a previous hit color instantly
-                        colors[unit_type] = {255, 25, 25} -- Red for normal kills
-                    end
-
-                    if damage_type == "arrow_poison_dot" or damage_type == "bleed" or damage_type == "burninating" then
-                        if opacities[unit_type] < 200 then -- Low priority color
-                            colors[unit_type] = {170, 25, 255} -- Purple for poison/dot kills
-                        end
-                    end
-                    if hit_zone == "head" or hit_zone == "weakspot" then
-                        colors[unit_type] = {255, 100, 25} -- Orange for headshot kills
-                    end                
+                   if color then
+                    colors[unit_type] = color
+                   end              
 
                     opacities[unit_type] = 255
                 elseif assists[unit_id] ~= nil then
                     if (os.time() - assists[unit_id]) <= 30 then -- Ignore assists older than 30 seconds
                         sizes[unit_type] = 0
                         if opacities[unit_type] < 200 then -- Low priority color
-                            colors[unit_type] = {7, 150, 210} -- Blue for assist kills
+                            colors[unit_type] = mod:get_color_from_settings("assist") -- Blue for assist kills
                         end
                         opacities[unit_type] = 255
                     end
