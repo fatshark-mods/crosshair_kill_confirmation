@@ -1,8 +1,10 @@
 return {
-	mod_description = {
+	mod_name = {
+		en = "Crosshair Kill Confirmation"
+	},
+        mod_description = {
 		en = "Crosshair Kill Confirmation description"
 	},
-	
 	duration = {
 		en = "Duration"
 	},
@@ -69,4 +71,131 @@ return {
 	option_none = {
 		en = "None"
 	},
+	color = {
+		en = "Color"
+	},
+	default = {
+		en = "Default"
+	},
+	red = {
+		en = "Red"
+	},
+	redregular = {
+		en = "Red"
+	},
+	reddot = {
+		en = "Red"
+	},
+	redhead = {
+		en = "Red"
+	},
+	redcrit = {
+		en = "Red"
+	},
+	redcrithead = {
+		en = "Red"
+	},
+	redassist = {
+		en = "Red"
+	},
+	green = {
+		en = "Green"
+	},
+	greenregular = {
+		en = "Green"
+	},
+	greendot = {
+		en = "Green"
+	},
+	greenhead = {
+		en = "Green"
+	},
+	greencrit = {
+		en = "Green"
+	},
+	greencrithead = {
+		en = "Green"
+	},
+	greenassist = {
+		en = "Green"
+	},
+	blue = {
+		en = "Blue"
+	},
+	blueregular = {
+		en = "Blue"
+	},
+	bluedot = {
+		en = "Blue"
+	},
+	bluehead = {
+		en = "Blue"
+	},
+	bluecrit = {
+		en = "Blue"
+	},
+	bluecrithead = {
+		en = "Blue"
+	},
+	blueassist = {
+		en = "Blue"
+	},
+	custom = {
+		en = "Custom"
+	},
+	custom_red = {
+		en = "Killmarker Red Value"
+	},
+	custom_red_tooltip = {
+		en = "Changes the red color value of your Killmarker"
+	},
+	custom_green = {
+		en = "Killmarker Green Value"
+	},
+	custom_green_tooltip = {
+		en = "Changes the green color value of your Killmarker"
+	},
+	custom_blue = {
+		en = "Killmarker Blue Value"
+	},
+	custom_blue_tooltip = {
+		en = "Changes the blue color value of your Killmarker"
+	},
+        KILL_MARKERS_DOT_COLOR_GROUP = {
+		en = "DoT Killmarkers Color"
+	},
+        KILL_MARKERS_DOT_COLOR_GROUP_T = {
+		en = "Set RGB color of the DoT Killmarkers Color"
+	},
+        KILL_MARKERS_REGULAR_COLOR_GROUP = {
+		en = "Regular Killmarkers Color"
+	},
+        KILL_MARKERS_REGULAR_COLOR_GROUP_T = {
+		en = "Set RGB color of the Regular Killmarkers Color"
+	},
+        KILL_MARKERS_CRITICAL_COLOR_GROUP = {
+		en = "Critical Kill Markers Color"
+	},
+        KILL_MARKERS_CRITICAL_COLOR_GROUP_T = {
+		en = "Set RGB color of the Critical Killmarkers Color"
+	},
+        KILL_MARKERS_HEAD_COLOR_GROUP = {
+		en = "Headshot Killmarkers Color"
+	},
+        KILL_MARKERS_HEAD_COLOR_GROUP_T = {
+		en = "Set RGB color of the Headshot Killmarkers Color"
+	},
+        KILL_MARKERS_HS_AND_CRIT_COLOR_GROUP = {
+		en = "Headshot+Critical Killmarkers Color"
+	},
+        KILL_MARKERS_HS_AND_CRIT_COLOR_GROUP_T = {
+		en = "Set RGB color of the Headshot+Critical Killmarkers Color"
+	},
+        KILL_MARKERS_ASSISTS_COLOR_GROUP = {
+		en = "Assists Killmarkers Color"
+	},
+        KILL_MARKERS_ASSISTS_COLOR_GROUP_T = {
+		en = "Set RGB color of the Assist Killmarkers Color"
+	},
+
 }
