@@ -1,11 +1,17 @@
 local mod = get_mod("Crosshair Kill Confirmation")
 
+local crit = false
+
 mod:hook_safe(DamageUtils, "buff_on_attack", function(unit, hit_unit, attack_type, is_critical) -- Check if the attack is a critical hit
+    local player = Managers.player:owner(unit)
+    if not player or player ~= Managers.player:local_player() then
+        return
+    end
     if is_critical then
         
         crit = true
     else
-        crit = false -- prevents false positives to reoccuring after first positive
+        crit = false -- prevents false positives to reoccur after first positive
     end
 
     return true
@@ -99,60 +105,21 @@ mod.unit_category = function(unit)
     breed_categories["critter_rat"] = "normal"
     breed_categories["critter_pig"] = "normal"
 
-    breed_categories["skaven_gutter_runner"] = "special"
-    breed_categories["skaven_pack_master"] = "special"
-    breed_categories["skaven_ratling_gunner"] = "special"
-    breed_categories["skaven_poison_wind_globadier"] = "special"
-    breed_categories["chaos_vortex_sorcerer"] = "special"
-    breed_categories["chaos_corruptor_sorcerer"] = "special"
-    breed_categories["skaven_warpfire_thrower"] = "special"
-    breed_categories["skaven_loot_rat"] = "special"
-    breed_categories["skaven_explosive_loot_rat"] = "special"
-    breed_categories["chaos_tentacle"] = "special"
-    breed_categories["chaos_tentacle_sorcerer"] = "special"
-    breed_categories["chaos_plague_sorcerer"] = "special"
-    breed_categories["chaos_plague_wave_spawner"] = "special"
-    breed_categories["chaos_vortex"] = "special"
-    breed_categories["chaos_dummy_sorcerer"] = "special"
-    breed_categories["beastmen_standard_bearer"] = "special"
-    breed_categories["beastmen_standard_bearer_crater"] = "special"
-
-    breed_categories["skaven_storm_vermin"] = "elite"
-    breed_categories["skaven_storm_vermin_commander"] = "elite"
-    breed_categories["skaven_storm_vermin_with_shield"] = "elite"
-    breed_categories["skaven_plague_monk"] = "elite"
-    breed_categories["chaos_berzerker"] = "elite"
-    breed_categories["chaos_raider"] = "elite"
-    breed_categories["chaos_warrior"] = "elite"
-    breed_categories["chaos_bulwark"] = "elite"
-    breed_categories["beastmen_bestigor"] = "elite"
-    
-    breed_categories["skaven_rat_ogre"] = "boss"
-    breed_categories["skaven_stormfiend"] = "boss"
-    breed_categories["skaven_storm_vermin_warlord"] = "boss"
-    breed_categories["skaven_stormfiend_boss"] = "boss"
-    breed_categories["skaven_grey_seer"] = "boss"
-    breed_categories["chaos_troll"] = "boss"
-    breed_categories["chaos_dummy_troll"] = "boss"
-    breed_categories["chaos_spawn"] = "boss"
-    breed_categories["chaos_exalted_champion"] = "boss"
-    breed_categories["chaos_exalted_champion_warcamp"] = "boss"
-    breed_categories["chaos_exalted_sorcerer"] = "boss"
-    breed_categories["beastmen_minotaur"] = "boss"
-
+for breed_name, breed in pairs(Breeds) do
+    if breed.boss then
+        breed_categories[breed_name] = "boss"
+    elseif breed.elite then
+        breed_categories[breed_name] = "elite"
+    elseif breed.special then
+        breed_categories[breed_name] = "special"
+    end
+end
     local breed_data = Unit.get_data(unit, "breed")
     breed_name = breed_data.name
     if breed_categories[breed_name] then
         return breed_categories[breed_name]
     else
-        -- Handle unknown breeds: everything below 550 HP is normal, above is a boss
-        local health_extension = ScriptUnit.extension(unit, "health_system")
-        local hp = health_extension:get_max_health()
-        if hp > 550 then
-            return "boss"
-        else
             return "normal"
-        end
     end
 end
 
@@ -196,15 +163,15 @@ mod:hook(GenericHitReactionExtension, "_execute_effect", function(func, self, un
                     sizes[unit_type] = 0
  
                    if (hit_zone == "head" or hit_zone == "weakspot") and crit then
-                        color = mod:get_color_from_settings("crithead")
+                        color = mod:get_color_from_settings("crithead") -- colour for headcrit kill
                    elseif damage_type == "arrow_poison_dot" or damage_type == "bleed" or damage_type == "burninating" then
-                        color = mod:get_color_from_settings("dot")
+                        color = mod:get_color_from_settings("dot") -- colour for DoT kill
                    elseif crit then
-                        color = mod:get_color_from_settings("crit")
+                        color = mod:get_color_from_settings("crit") -- colour for crit kill
                    elseif hit_zone == "head" or hit_zone == "weakspot" then
-                        color = mod:get_color_from_settings("head")
+                        color = mod:get_color_from_settings("head") -- colour for headshot kill
                    elseif opacities[unit_type] and opacities[unit_type] < 200 then
-                        color = mod:get_color_from_settings("regular")
+                        color = mod:get_color_from_settings("regular") -- colour for regular kill
                    end
 
                    if color then

@@ -147,55 +147,55 @@ return {
 		en = "Killmarker Red Value"
 	},
 	custom_red_tooltip = {
-		en = "Changes the red color value of your Killmarker"
+		en = "Changes the red color value of your killmarker"
 	},
 	custom_green = {
 		en = "Killmarker Green Value"
 	},
 	custom_green_tooltip = {
-		en = "Changes the green color value of your Killmarker"
+		en = "Changes the green color value of your killmarker"
 	},
 	custom_blue = {
 		en = "Killmarker Blue Value"
 	},
 	custom_blue_tooltip = {
-		en = "Changes the blue color value of your Killmarker"
+		en = "Changes the blue color value of your killmarker"
 	},
         KILL_MARKERS_DOT_COLOR_GROUP = {
 		en = "DoT Killmarkers Color"
 	},
         KILL_MARKERS_DOT_COLOR_GROUP_T = {
-		en = "Set RGB color of the DoT Killmarkers Color"
+		en = "Set RGB color of the DoT killmarkers color"
 	},
         KILL_MARKERS_REGULAR_COLOR_GROUP = {
 		en = "Regular Killmarkers Color"
 	},
         KILL_MARKERS_REGULAR_COLOR_GROUP_T = {
-		en = "Set RGB color of the Regular Killmarkers Color"
+		en = "Set RGB color of the Regular killmarkers color"
 	},
         KILL_MARKERS_CRITICAL_COLOR_GROUP = {
 		en = "Critical Kill Markers Color"
 	},
         KILL_MARKERS_CRITICAL_COLOR_GROUP_T = {
-		en = "Set RGB color of the Critical Killmarkers Color"
+		en = "Set RGB color of the critical killmarkers color"
 	},
         KILL_MARKERS_HEAD_COLOR_GROUP = {
 		en = "Headshot Killmarkers Color"
 	},
         KILL_MARKERS_HEAD_COLOR_GROUP_T = {
-		en = "Set RGB color of the Headshot Killmarkers Color"
+		en = "Set RGB color of the headshot killmarkers color"
 	},
         KILL_MARKERS_HS_AND_CRIT_COLOR_GROUP = {
 		en = "Headshot+Critical Killmarkers Color"
 	},
         KILL_MARKERS_HS_AND_CRIT_COLOR_GROUP_T = {
-		en = "Set RGB color of the Headshot+Critical Killmarkers Color"
+		en = "Set RGB color of the headshot+critical killmarkers color"
 	},
         KILL_MARKERS_ASSISTS_COLOR_GROUP = {
 		en = "Assists Killmarkers Color"
 	},
         KILL_MARKERS_ASSISTS_COLOR_GROUP_T = {
-		en = "Set RGB color of the Assist Killmarkers Color"
+		en = "Set RGB color of the assist killmarkers color"
 	},
 
 }
