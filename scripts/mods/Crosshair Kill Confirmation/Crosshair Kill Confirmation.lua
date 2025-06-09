@@ -1,5 +1,30 @@
 local mod = get_mod("Crosshair Kill Confirmation")
 
+local crit = false
+
+mod:hook_safe(DamageUtils, "buff_on_attack", function(unit, hit_unit, attack_type, is_critical) -- Check if the attack is a critical hit
+    local player = Managers.player:owner(unit)
+    if not player or player ~= Managers.player:local_player() then
+        return
+    end
+    if is_critical then
+        
+        crit = true
+    else
+        crit = false -- prevents false positives to reoccur after first positive
+    end
+
+    return true
+end)
+
+mod.get_color_from_settings = function(self, type)
+    local red = mod:get("red" .. type)
+    local green = mod:get("green" .. type)
+    local blue = mod:get("blue" .. type)
+
+    return { red or 255, green or 255, blue or 255 }
+end
+
 local unit_types = {
     "normal",
     "special",
@@ -80,59 +105,21 @@ mod.unit_category = function(unit)
     breed_categories["critter_rat"] = "normal"
     breed_categories["critter_pig"] = "normal"
 
-    breed_categories["skaven_gutter_runner"] = "special"
-    breed_categories["skaven_pack_master"] = "special"
-    breed_categories["skaven_ratling_gunner"] = "special"
-    breed_categories["skaven_poison_wind_globadier"] = "special"
-    breed_categories["chaos_vortex_sorcerer"] = "special"
-    breed_categories["chaos_corruptor_sorcerer"] = "special"
-    breed_categories["skaven_warpfire_thrower"] = "special"
-    breed_categories["skaven_loot_rat"] = "special"
-    breed_categories["skaven_explosive_loot_rat"] = "special"
-    breed_categories["chaos_tentacle"] = "special"
-    breed_categories["chaos_tentacle_sorcerer"] = "special"
-    breed_categories["chaos_plague_sorcerer"] = "special"
-    breed_categories["chaos_plague_wave_spawner"] = "special"
-    breed_categories["chaos_vortex"] = "special"
-    breed_categories["chaos_dummy_sorcerer"] = "special"
-    breed_categories["beastmen_standard_bearer"] = "special"
-    breed_categories["beastmen_standard_bearer_crater"] = "special"
-
-    breed_categories["skaven_storm_vermin"] = "elite"
-    breed_categories["skaven_storm_vermin_commander"] = "elite"
-    breed_categories["skaven_storm_vermin_with_shield"] = "elite"
-    breed_categories["skaven_plague_monk"] = "elite"
-    breed_categories["chaos_berzerker"] = "elite"
-    breed_categories["chaos_raider"] = "elite"
-    breed_categories["chaos_warrior"] = "elite"
-    breed_categories["beastmen_bestigor"] = "elite"
-    
-    breed_categories["skaven_rat_ogre"] = "boss"
-    breed_categories["skaven_stormfiend"] = "boss"
-    breed_categories["skaven_storm_vermin_warlord"] = "boss"
-    breed_categories["skaven_stormfiend_boss"] = "boss"
-    breed_categories["skaven_grey_seer"] = "boss"
-    breed_categories["chaos_troll"] = "boss"
-    breed_categories["chaos_dummy_troll"] = "boss"
-    breed_categories["chaos_spawn"] = "boss"
-    breed_categories["chaos_exalted_champion"] = "boss"
-    breed_categories["chaos_exalted_champion_warcamp"] = "boss"
-    breed_categories["chaos_exalted_sorcerer"] = "boss"
-    breed_categories["beastmen_minotaur"] = "boss"
-
+for breed_name, breed in pairs(Breeds) do
+    if breed.boss then
+        breed_categories[breed_name] = "boss"
+    elseif breed.elite then
+        breed_categories[breed_name] = "elite"
+    elseif breed.special then
+        breed_categories[breed_name] = "special"
+    end
+end
     local breed_data = Unit.get_data(unit, "breed")
     breed_name = breed_data.name
     if breed_categories[breed_name] then
         return breed_categories[breed_name]
     else
-        -- Handle unknown breeds: everything below 300 HP is normal, above is a boss
-        local health_extension = ScriptUnit.extension(unit, "health_system")
-        local hp = health_extension:get_max_health()
-        if hp > 300 then
-            return "boss"
-        else
             return "normal"
-        end
     end
 end
 
@@ -174,26 +161,29 @@ mod:hook(GenericHitReactionExtension, "_execute_effect", function(func, self, un
 
                 if attacker_unit == player_unit then
                     sizes[unit_type] = 0
+ 
+                   if (hit_zone == "head" or hit_zone == "weakspot") and crit then
+                        color = mod:get_color_from_settings("crithead") -- colour for headcrit kill
+                   elseif damage_type == "arrow_poison_dot" or damage_type == "bleed" or damage_type == "burninating" then
+                        color = mod:get_color_from_settings("dot") -- colour for DoT kill
+                   elseif crit then
+                        color = mod:get_color_from_settings("crit") -- colour for crit kill
+                   elseif hit_zone == "head" or hit_zone == "weakspot" then
+                        color = mod:get_color_from_settings("head") -- colour for headshot kill
+                   elseif opacities[unit_type] and opacities[unit_type] < 200 then
+                        color = mod:get_color_from_settings("regular") -- colour for regular kill
+                   end
 
-                    if opacities[unit_type] < 200 then -- Low priority color - Avoid overriding a previous hit color instantly
-                        colors[unit_type] = {255, 25, 25} -- Red for normal kills
-                    end
-
-                    if damage_type == "arrow_poison_dot" or damage_type == "bleed" or damage_type == "burninating" then
-                        if opacities[unit_type] < 200 then -- Low priority color
-                            colors[unit_type] = {170, 25, 255} -- Purple for poison/dot kills
-                        end
-                    end
-                    if hit_zone == "head" or hit_zone == "weakspot" then
-                        colors[unit_type] = {255, 100, 25} -- Orange for headshot kills
-                    end                
+                   if color then
+                    colors[unit_type] = color
+                   end              
 
                     opacities[unit_type] = 255
                 elseif assists[unit_id] ~= nil then
                     if (os.time() - assists[unit_id]) <= 30 then -- Ignore assists older than 30 seconds
                         sizes[unit_type] = 0
                         if opacities[unit_type] < 200 then -- Low priority color
-                            colors[unit_type] = {7, 150, 210} -- Blue for assist kills
+                            colors[unit_type] = mod:get_color_from_settings("assist") -- Blue for assist kills
                         end
                         opacities[unit_type] = 255
                     end
