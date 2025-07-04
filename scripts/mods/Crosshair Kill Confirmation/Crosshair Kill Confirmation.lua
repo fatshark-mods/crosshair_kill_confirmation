@@ -8,7 +8,6 @@ mod:hook_safe(DamageUtils, "buff_on_attack", function(unit, hit_unit, attack_typ
         return
     end
     if is_critical then
-        
         crit = true
     else
         crit = false -- prevents false positives to reoccur after first positive
@@ -36,7 +35,7 @@ local sizes = {}
 local crosshairs = {}
 local colors = {}
 for i=1, #unit_types, 1 do
-    unit_type = unit_types[i]
+    local unit_type = unit_types[i]
     opacities[unit_type] = 0
     sizes[unit_type] = 0
     crosshairs[unit_type] = "dot"
@@ -69,7 +68,7 @@ mod.create_gui = function(self)
 
         -- Fetch mod settings
         for i=1, #unit_types, 1 do
-            unit_type = unit_types[i]
+            local unit_type = unit_types[i]
             crosshairs[unit_type] = mod:get("crosshair_"..unit_type)
         end
         duration = mod:get("duration")
@@ -115,11 +114,11 @@ for breed_name, breed in pairs(Breeds) do
     end
 end
     local breed_data = Unit.get_data(unit, "breed")
-    breed_name = breed_data.name
+    local breed_name = breed_data.name
     if breed_categories[breed_name] then
         return breed_categories[breed_name]
     else
-            return "normal"
+        return "normal"
     end
 end
 
@@ -161,22 +160,23 @@ mod:hook(GenericHitReactionExtension, "_execute_effect", function(func, self, un
 
                 if attacker_unit == player_unit then
                     sizes[unit_type] = 0
- 
-                   if (hit_zone == "head" or hit_zone == "weakspot") and crit then
-                        color = mod:get_color_from_settings("crithead") -- colour for headcrit kill
-                   elseif damage_type == "arrow_poison_dot" or damage_type == "bleed" or damage_type == "burninating" then
-                        color = mod:get_color_from_settings("dot") -- colour for DoT kill
-                   elseif crit then
-                        color = mod:get_color_from_settings("crit") -- colour for crit kill
-                   elseif hit_zone == "head" or hit_zone == "weakspot" then
-                        color = mod:get_color_from_settings("head") -- colour for headshot kill
-                   elseif opacities[unit_type] and opacities[unit_type] < 200 then
-                        color = mod:get_color_from_settings("regular") -- colour for regular kill
-                   end
 
-                   if color then
-                    colors[unit_type] = color
-                   end              
+                    local color
+                    if (hit_zone == "head" or hit_zone == "weakspot") and crit then
+                        color = mod:get_color_from_settings("crithead") -- colour for headcrit kill
+                    elseif damage_type == "arrow_poison_dot" or damage_type == "bleed" or damage_type == "burninating" then
+                        color = mod:get_color_from_settings("dot") -- colour for DoT kill
+                    elseif crit then
+                        color = mod:get_color_from_settings("crit") -- colour for crit kill
+                    elseif hit_zone == "head" or hit_zone == "weakspot" then
+                        color = mod:get_color_from_settings("head") -- colour for headshot kill
+                    elseif opacities[unit_type] and opacities[unit_type] < 200 then
+                        color = mod:get_color_from_settings("regular") -- colour for regular kill
+                    end
+
+                    if color then
+                        colors[unit_type] = color
+                    end
 
                     opacities[unit_type] = 255
                 elseif assists[unit_id] ~= nil then
@@ -207,10 +207,11 @@ mod:hook_safe(CrosshairUI, "update_hit_markers", function(self, dt)
         mod:create_gui()
     end
     for i=1, #unit_types, 1 do
-        unit_type = unit_types[i]
+        local unit_type = unit_types[i]
         if crosshairs[unit_type] ~= "none" then
             opacities[unit_type] = math.max(0, opacities[unit_type] - (dt/duration)*255)
-            interp_opacity = mod.interp_opacity(opacities[unit_type])
+            local interp_opacity = mod.interp_opacity(opacities[unit_type])
+            local interp_size
             if unit_type == "normal" then
                 interp_size = min_s*0.8  -- no animation for normal enemies
             else
